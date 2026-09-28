@@ -8,17 +8,10 @@ html, body, #root {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* ── Sidebar responsive : 240px sur desktop, 68px sur mobile ── */
+/* ── Sidebar Desktop ── */
 :root {
   --sidebar-width: 240px;
   --sidebar-min-width: 240px;
-}
-
-@media (max-width: 767px) {
-  :root {
-    --sidebar-width: 68px;
-    --sidebar-min-width: 68px;
-  }
 }
 
 /* Custom scrollbars */

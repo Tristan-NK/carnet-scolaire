@@ -8,7 +8,7 @@ import {
   Bookmark, Flame, Star, LayoutGrid, List, CheckSquare, Square,
   ZoomIn, ZoomOut, FileText, FolderArchive, ShieldCheck, Volume2,
   Lock, Key, LogIn, LogOut, Mail, Send, Copy, Cloud, Database,
-  LifeBuoy, MessageSquare, BookMarked, Dumbbell, Coffee
+  LifeBuoy, MessageSquare, BookMarked, Dumbbell, Coffee, Menu
 } from "lucide-react";
 import { getItem, setItem } from "./storage.js";
 import {
@@ -1003,6 +1003,7 @@ export default function App() {
   const [loaded, setLoaded] = useState(false);
   const [syncStatus, setSyncStatus] = useState("synced");
   const [bienvenueOverlay, setBienvenueOverlay] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const syncTimeoutRef = useRef(null);
 
   // ── Notifications & Alarmes ──
@@ -1246,8 +1247,8 @@ export default function App() {
 
   return (
     <div
-      style={{ background: PAPER, fontFamily: SANS, minHeight: "100vh" }}
-      className="flex overflow-hidden relative"
+      style={{ background: PAPER, fontFamily: SANS, height: "100dvh" }}
+      className="flex overflow-hidden relative w-full"
     >
       {/* Animation de Bienvenue après création de compte */}
       {bienvenueOverlay && (
@@ -1257,14 +1258,21 @@ export default function App() {
         />
       )}
 
+      {/* ── Overlay Sidebar Mobile ── */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-stone-900/50 z-40 md:hidden backdrop-blur-sm transition-opacity"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* ====================================================
-          SIDEBAR — Desktop: 240px avec labels | Mobile: 68px icônes
+          SIDEBAR — Desktop: 240px | Mobile: Tiroir Masqué
           ==================================================== */}
       <nav
-        className="no-print flex flex-col shrink-0 z-30 transition-all duration-300"
+        className={`no-print flex flex-col shrink-0 z-50 transition-all duration-300 fixed md:static h-full ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
         style={{
-          width: "var(--sidebar-width, 240px)",
-          minWidth: "var(--sidebar-min-width, 240px)",
+          width: 240,
           background: `linear-gradient(175deg, ${VERT_DARK} 0%, ${GABON_VERT} 35%, ${GABON_BLEU} 85%, ${BLEU_DARK} 100%)`,
           boxShadow: "3px 0 20px rgba(0,0,0,0.18)",
         }}
@@ -1280,7 +1288,7 @@ export default function App() {
             className="w-11 h-11 rounded-2xl object-cover shadow-lg flex-shrink-0"
             style={{ border: "2px solid rgba(255,255,255,0.25)" }}
           />
-          <div className="overflow-hidden hidden md:block">
+          <div className="overflow-hidden">
             <div className="text-sm font-black text-white leading-tight tracking-wide">Carnet Scolaire</div>
             <div className="flex items-center gap-1.5 mt-0.5">
               <img src="/logo-gabon.svg" alt="Gabon" className="w-4 h-3 rounded-[2px] shadow-xs" />
@@ -1297,7 +1305,7 @@ export default function App() {
             return (
               <button
                 key={t.id}
-                onClick={() => setTab(t.id)}
+                onClick={() => { setTab(t.id); setSidebarOpen(false); }}
                 title={t.label}
                 className={`w-full flex items-center gap-3 px-2.5 py-2 rounded-xl transition-all duration-150 group ${
                   active ? "" : "hover:bg-white/10"
@@ -1324,9 +1332,9 @@ export default function App() {
                   />
                 </div>
 
-                {/* Label visible uniquement sur desktop */}
+                {/* Label (toujours visible avec drawer) */}
                 <span
-                  className="text-sm font-semibold hidden md:block truncate flex-1 text-left"
+                  className="text-sm font-semibold truncate flex-1 text-left"
                   style={{ color: active ? "#fff" : "rgba(255,255,255,0.75)" }}
                 >
                   {t.label}
@@ -1335,7 +1343,7 @@ export default function App() {
                 {/* Point actif */}
                 {active && (
                   <div
-                    className="w-1.5 h-1.5 rounded-full flex-shrink-0 hidden md:block"
+                    className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                     style={{ background: GABON_JAUNE }}
                   />
                 )}
@@ -1354,25 +1362,25 @@ export default function App() {
             {syncStatus === "synced" && (
               <>
                 <Cloud size={13} className="text-emerald-300 flex-shrink-0" />
-                <span className="text-[11px] text-white/70 hidden md:block">Synchronisé</span>
+                <span className="text-[11px] text-white/70">Synchronisé</span>
               </>
             )}
             {syncStatus === "saving" && (
               <>
                 <RefreshCw size={13} className="animate-spin text-amber-300 flex-shrink-0" />
-                <span className="text-[11px] text-amber-200 hidden md:block">Synchronisation…</span>
+                <span className="text-[11px] text-amber-200">Synchronisation…</span>
               </>
             )}
             {syncStatus === "error" && (
               <>
                 <AlertTriangle size={13} className="text-red-300 flex-shrink-0" />
-                <span className="text-[11px] text-red-200 hidden md:block">Hors-ligne (local)</span>
+                <span className="text-[11px] text-red-200">Hors-ligne (local)</span>
               </>
             )}
             {syncStatus === "offline" && (
               <>
                 <Cloud size={13} className="opacity-40 text-white flex-shrink-0" />
-                <span className="text-[11px] text-white/50 hidden md:block">Hors-ligne</span>
+                <span className="text-[11px] text-white/50">Hors-ligne</span>
               </>
             )}
           </div>
@@ -1389,7 +1397,7 @@ export default function App() {
               >
                 {(user.prenom || user.nom || "?")[0].toUpperCase()}
               </div>
-              <div className="overflow-hidden hidden md:block">
+              <div className="overflow-hidden">
                 <div className="text-xs font-bold text-white truncate">{user.prenom || user.nom}</div>
                 <div className="text-[10px] text-white/60 truncate">{data.settings.classe || "Élève"}</div>
               </div>
@@ -1409,7 +1417,7 @@ export default function App() {
             title="Se déconnecter"
           >
             <LogOut size={16} className="flex-shrink-0" />
-            <span className="text-xs font-semibold hidden md:block">Déconnexion</span>
+            <span className="text-xs font-semibold">Déconnexion</span>
           </button>
         </div>
       </nav>
@@ -1430,8 +1438,16 @@ export default function App() {
           }}
         >
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-stone-100 hover:bg-stone-200 transition-colors"
+              style={{ color: INK_SOFT }}
+              title="Ouvrir le menu"
+            >
+              <Menu size={20} />
+            </button>
             <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              className="w-8 h-8 rounded-lg flex items-center justify-center hidden sm:flex"
               style={{ background: (activeTab?.color || GABON_BLEU) + "20", color: activeTab?.color || GABON_BLEU }}
             >
               <ActiveIcon size={16} />
