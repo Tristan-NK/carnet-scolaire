@@ -537,6 +537,18 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// Servir l'application React PWA en production (dossier dist)
+const DIST_DIR = path.join(__dirname, "..", "dist");
+if (fs.existsSync(DIST_DIR)) {
+  app.use(express.static(DIST_DIR, { maxAge: "1d" }));
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api") || req.path.startsWith("/uploads")) {
+      return next();
+    }
+    res.sendFile(path.join(DIST_DIR, "index.html"));
+  });
+}
+
 // Gestionnaire d'erreur global pour éviter tout crash serveur
 app.use((err, req, res, next) => {
   console.error("Erreur non gérée:", err);
