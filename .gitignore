@@ -1,0 +1,27 @@
+# Dépendances et builds
+node_modules/
+dist/
+dist-ssr/
+*.local
+vite.config.js.timestamp-*
+
+# Variables d'environnement & Secrets (CRITIQUE pour sécurité Neon)
+.env
+.env.*
+!.env.example
+.jwt_secret
+server/.jwt_secret
+.neon
+.neon*
+
+# Données locales SQLite et Uploads
+server/carnet.db*
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Logs et OS
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
