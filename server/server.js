@@ -541,7 +541,8 @@ app.get("/api/health", (req, res) => {
 const DIST_DIR = path.join(__dirname, "..", "dist");
 if (fs.existsSync(DIST_DIR)) {
   app.use(express.static(DIST_DIR, { maxAge: "1d" }));
-  app.get("*", (req, res, next) => {
+  app.use((req, res, next) => {
+    if (req.method !== "GET" && req.method !== "HEAD") return next();
     if (req.path.startsWith("/api") || req.path.startsWith("/uploads")) {
       return next();
     }
